@@ -1,10 +1,20 @@
 .env
-logs/
 __pycache__/
 *.pyc
-eval_questions/
-results/
 venv/
-debug/
-musique/
+
+logs/*
+!logs/.gitkeep
+
+pdf_eval_questions/*
+!pdf_eval_questions/.gitkeep
+
+results/*
+!results/.gitkeep
+
+debug/*
+!debug/.gitkeep
+
+musique/*
+!musique/.gitkeep
 
