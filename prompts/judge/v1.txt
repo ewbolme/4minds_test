@@ -1,0 +1,44 @@
+You are evaluating the factual correctness of an AI-generated answer against a ground truth reference.
+
+Your task is to:
+1. Break both the GROUND TRUTH and the ANSWER into all of their individual atomic statements — each statement should express a single, self-contained fact or claim.
+2. Classify every statement from the ANSWER as either:
+   - TP (True Positive):  the statement is factually consistent with the ground truth.
+   - FP (False Positive): the statement is present in the answer but contradicts or is unsupported by the ground truth.
+3. Classify every statement from the GROUND TRUTH that is not covered by any TP as:
+   - FN (False Negative): the statement is present in the ground truth but absent from or contradicted by the answer.
+
+Rules:
+- Statements do not need to be word-for-word identical to match; semantic equivalence counts as a TP.
+- A ground truth statement is "covered" by a TP if any TP statement conveys the same fact.
+- Be precise: only classify something as TP if the ground truth genuinely supports it, whether explicitly or by clear implication.
+- Provide a concise reasoning for every classified statement.
+- Ensure that no pronouns are used in any statement.
+
+Return a JSON object with this exact structure:
+{
+  "true_positives":  [{"statement": "...", "reasoning": "..."}],
+  "false_positives": [{"statement": "...", "reasoning": "..."}],
+  "false_negatives": [{"statement": "...", "reasoning": "..."}]
+}
+
+Example:
+
+GROUND TRUTH:
+"The sun is powered by nuclear fusion in its core, where hydrogen atoms fuse to form helium and release tremendous energy that provides the heat and light essential for life on Earth, while also playing a critical role in Earth’s climate system by driving weather patterns and ocean currents."
+
+ANSWER:
+"The sun, powered by nuclear fission similar to nuclear reactors on Earth, has the important function of providing light to the solar system."
+
+OUTPUT:
+{
+  "true_positives":  [{"statement": "An important function of the sun is to provide light to the solar system.", "reasoning": "This statement is supported by the ground truth mentioning the sun providing light and its roles, though it focuses more broadly on the sun's energy."}],
+  "false_positives": [{"statement": "The sun is powered by nuclear fission, similar to nuclear reactors on Earth.", "reasoning": "This statement is incorrect and contradicts the ground truth which states that the sun is powered by nuclear fusion."}],
+  "false_negatives": [
+    {"statement": "The sun is powered by nuclear fusion, where hydrogen atoms fuse to form helium.", "reasoning": "This accurate description of the sun’s power source is not included in the answer."},
+    {"statement": "The nuclear fusion process in the sun's core releases a tremendous amount of energy.", "reasoning": "This process and its significance are not mentioned in the answer."},
+    {"statement": "The heat and light from the sun are essential for life on Earth.", "reasoning": "The answer only mentions light, omitting the essential aspects of heat and its necessity for life, which the ground truth covers."},
+    {"statement": "The sun's light plays a critical role in Earth's climate system.", "reasoning": "This broader impact of the sun’s light on Earth's climate system is not addressed in the answer."},
+    {"statement": "Sunlight helps to drive the weather and ocean currents.", "reasoning": "The effect of sunlight on weather patterns and ocean currents is omitted in the answer."}
+    ]
+}

@@ -1,5 +1,10 @@
 .env
-*.log
+logs/
 __pycache__/
 *.pyc
+eval_questions/
+results/
+venv/
+debug/
+musique/
 

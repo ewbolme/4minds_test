@@ -1,0 +1,813 @@
+Developer Tools
+4MINDS API Reference
+Complete reference for 4MINDS REST API endpoints.
+
+​
+Models
+​
+List All Available Models
+GET /api/v1/user/model
+List all available models in your account.
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+url = "https://api.4minds.ai/api/v1/user/model"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+response = requests.get(url, headers=headers)
+models = response.json()
+
+for model in models:
+    print(f"Model: {model['name']} - ID: {model['id']}")
+​
+Get Model Details
+GET /api/v1/user/model/{model_id}
+Get details about a specific model.
+​
+Parameters
+Parameter	Type	Required	Description
+model_id	string	Yes	The unique identifier of the model
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+model_id = "your_model_id"
+url = f"https://api.4minds.ai/api/v1/user/model/{model_id}"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+response = requests.get(url, headers=headers)
+model_details = response.json()
+print(model_details)
+​
+Create a New Model
+POST /api/v1/user/model
+Create a new model (optionally with a dataset attached).
+
+cURL
+
+Python
+
+JavaScript
+import requests
+
+url = "https://api.4minds.ai/api/v1/user/model"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+payload = {
+    "name": "your-model-name",
+    "dataset": "optional-dataset-id"
+}
+
+response = requests.post(url, headers=headers, json=payload)
+new_model = response.json()
+print(f"Created model: {new_model}")
+​
+Delete a Model
+DELETE /api/v1/user/model/{id}
+Delete a model by ID.
+​
+Parameters
+Parameter	Type	Required	Description
+id	string	Yes	The unique identifier of the model to delete
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+model_id = 123
+url = f"https://api.4minds.ai/api/v1/user/model/{model_id}"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+response = requests.delete(url, headers=headers)
+
+if response.status_code == 200:
+    result = response.json()
+    if result:
+        print(f"Model {model_id} deleted successfully")
+else:
+    print(f"Error: {response.status_code} - {response.text}")
+​
+Conversations
+​
+List All Conversations
+GET /api/v1/user/conversations
+Retrieves all conversations for a specific model.
+​
+Query Parameters
+Parameter	Type	Required	Description
+model_id	string	Yes	The ID of the model to list conversations for
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+url = "https://api.4minds.ai/api/v1/user/conversations"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+params = {
+    "model_id": 1,
+    "limit": 10,
+    "offset": 0
+}
+
+response = requests.get(url, headers=headers, params=params)
+conversations = response.json()
+
+for conv in conversations['conversations']:
+    print(f"Conversation: {conv['title']}")
+    print(f"  ID: {conv['id']}")
+    print(f"  Messages: {conv['total_messages']}")
+    print(f"  Created: {conv['created_at']}")
+​
+Create a New Conversation
+POST /api/v1/user/conversations
+Creates a new conversation thread.
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+url = "https://api.4minds.ai/api/v1/user/conversations"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "title": "Customer Support Chat",
+    "model_id": 1
+}
+
+response = requests.post(url, headers=headers, json=data)
+conversation = response.json()
+
+print(f"Conversation created: {conversation['id']}")
+print(f"Title: {conversation['title']}")
+print(f"Model ID: {conversation['model_id']}")
+​
+Rename a Conversation
+PATCH /api/v1/user/conversations/{conversation_id}
+Updates the title of an existing conversation.
+​
+Path Parameters
+Parameter	Type	Required	Description
+conversation_id	string	Yes	The ID of the conversation to rename
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+conversation_id = "CONVERSATION_ID"
+url = f"https://api.4minds.ai/api/v1/user/conversations/{conversation_id}"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+params = {
+    "title": "Updated Conversation Title"
+}
+
+response = requests.patch(url, headers=headers, params=params)
+conversation = response.json()
+
+print(f"Conversation updated: {conversation['id']}")
+print(f"New title: {conversation['title']}")
+​
+Delete a Conversation
+DELETE /api/v1/user/conversations/{conversation_id}
+Permanently deletes a conversation and all its messages.
+​
+Path Parameters
+Parameter	Type	Required	Description
+conversation_id	string	Yes	The ID of the conversation to delete
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+conversation_id = "CONVERSATION_ID"
+url = f"https://api.4minds.ai/api/v1/user/conversations/{conversation_id}"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+response = requests.delete(url, headers=headers)
+
+if response.status_code == 200:
+    print(f"Conversation {conversation_id} deleted successfully")
+else:
+    print(f"Error: {response.status_code}")
+​
+Get All Messages from a Conversation
+GET /api/v1/user/conversations/{conversation_id}/messages
+Retrieves all messages from a specific conversation thread.
+​
+Path Parameters
+Parameter	Type	Required	Description
+conversation_id	string	Yes	The ID of the conversation
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+conversation_id = "CONVERSATION_ID"
+url = f"https://api.4minds.ai/api/v1/user/conversations/{conversation_id}/messages"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+params = {
+    "limit": 50,
+    "offset": 0
+}
+
+response = requests.get(url, headers=headers, params=params)
+messages = response.json()
+
+for msg in messages:
+    print(f"{msg['sender_type']}: {msg['content']}")
+    print(f"  Time: {msg['timestamp']}")
+​
+Datasets
+​
+List All Datasets
+GET /api/v1/user/dataset
+Retrieves a list of all available datasets.
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+url = " https://api.4minds.ai/api/v1/user/dataset"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+response = requests.get(url, headers=headers)
+datasets = response.json()
+
+for dataset in datasets:
+    print(f"Dataset: {dataset['name']}")
+    print(f"  ID: {dataset['id']}")
+    print(f"  Size: {dataset['size']} bytes")
+    print(f"  Created: {dataset['created_at']}")
+​
+Get Dataset Details
+GET /api/v1/user/dataset/{id}
+Retrieves detailed information about a specific dataset.
+​
+Path Parameters
+Parameter	Type	Required	Description
+id	string	Yes	The unique identifier of the dataset
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+dataset_id = "dataset-123"
+url = f" https://api.4minds.ai/api/v1/user/dataset/{dataset_id}"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+response = requests.get(url, headers=headers)
+dataset = response.json()
+
+print(f"Dataset Name: {dataset['name']}")
+print(f"ID: {dataset['id']}")
+print(f"Size: {dataset['size']} bytes")
+print(f"Status: {dataset['status']}")
+print(f"Created: {dataset['created_at']}")
+​
+Create a New Dataset
+POST /api/v1/user/dataset
+Creates a new dataset by uploading files or providing URLs to scrape.
+​
+Request Body
+Parameter	Type	Required	Description
+name	string	Yes	Name of the dataset
+description	string	No	Description of the dataset
+files	array	No	Array of files to upload
+urls	array	No	Array of URLs to scrape for data
+
+cURL (Files Only)
+
+cURL (URLs Only)
+
+cURL (Files + URLs)
+
+Python (Files Only)
+
+Python (URLs Only)
+
+Python (Files + URLs)
+
+JavaScript (Files Only)
+
+JavaScript (URLs Only)
+
+JavaScript (Files + URLs)
+
+Node.js (Files Only)
+
+Node.js (URLs Only)
+
+Node.js (Files + URLs)
+curl -X POST  https://api.4minds.ai/api/v1/user/dataset \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -F "files=@training_data.jsonl" \
+  -F "files=@additional_data.csv" \
+  -F "dataset_name=Customer Support Dataset" \
+  -F "description=Training data for customer support bot" \
+  -F "tags=support,training,chatbot"
+​
+Upload Files to Dataset
+POST /api/v1/user/dataset/upload
+Adds files to an existing dataset.
+​
+Request Body
+Multipart form data with the following fields:
+Parameter	Type	Required	Description
+dataset_id	string	Yes	The ID of the dataset
+file	file	Yes	The file to upload
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+dataset_id = 123
+url = " https://api.4minds.ai/api/v1/user/dataset/upload"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+# Upload multiple files to existing dataset
+files = [
+    ('files', ('training_data.jsonl', open('training_data.jsonl', 'rb'), 'application/x-jsonlines')),
+    ('files', ('additional_data.csv', open('additional_data.csv', 'rb'), 'text/csv'))
+]
+
+data = {
+    'dataset_id': dataset_id
+}
+
+response = requests.post(url, headers=headers, files=files, data=data)
+
+if response.status_code == 200:
+    result = response.json()
+    print(f"Files added successfully to dataset {dataset_id}")
+    print(f"Files uploaded: {result['files_uploaded']}")
+    print(f"Total files: {result['total_files']}")
+​
+Delete a Dataset
+DELETE /api/v1/user/dataset/{id}
+Deletes a dataset. This can be a soft delete (by default), or a permanent delete.
+​
+Path Parameters
+Parameter	Type	Required	Description
+id	string	Yes	The unique identifier of the dataset
+​
+Query Parameters
+Parameter	Type	Required	Description
+permanent	boolean	No	Set to true for permanent deletion. Default is false (soft delete)
+
+cURL (Soft Delete)
+
+cURL (Permanent Delete)
+
+Python (Soft Delete)
+
+Python (Permanent Delete)
+
+JavaScript (Soft Delete)
+
+JavaScript (Permanent Delete)
+
+Node.js (Soft Delete)
+
+Node.js (Permanent Delete)
+curl -X DELETE  https://api.4minds.ai/api/v1/user/dataset/123 \
+  -H "Authorization: Bearer YOUR_API_KEY"
+​
+Evaluations
+​
+List All Evaluations
+GET /api/v1/evaluations
+List all evaluations with pagination and filtering.
+​
+Query Parameters
+Parameter	Type	Required	Description
+page	integer	No	Page number for pagination
+per_page	integer	No	Number of results per page (default: 20)
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+url = " https://api.4minds.ai/api/v1/evaluations"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+params = {
+    "page": 1,
+    "per_page": 20,
+    "status": "completed"  # Optional: pending, running, completed, failed
+}
+
+response = requests.get(url, headers=headers, params=params)
+evaluations = response.json()
+
+for eval in evaluations['evaluations']:
+    print(f"Evaluation: {eval['name']} - Score: {eval['score']}")
+​
+Create a New Evaluation
+POST /api/v1/evaluations
+Create a new evaluation for a model.
+​
+Request Body
+Parameter	Type	Required	Description
+model_id	string	Yes	The ID of the model to evaluate
+name	string	Yes	Name of the evaluation
+config	object	No	Model-specific configuration for evaluation
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+url = " https://api.4minds.ai/api/v1/evaluations"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "name": "GPT-4 RAGAS Evaluation",
+    "description": "Evaluate GPT-4 on BEIR dataset",
+    "type": "ragas",
+    "model_id": 123,
+    "benchmark_type": "beir",
+    "question_count": 700
+}
+
+response = requests.post(url, headers=headers, json=data)
+evaluation = response.json()
+
+print(f"Created evaluation: {evaluation['name']}")
+print(f"Evaluation ID: {evaluation['id']}")
+print(f"Status: {evaluation['status']}")
+​
+Get Evaluation Details
+GET /api/v1/evaluations/{evaluation_id}
+Get details about a specific evaluation.
+​
+Path Parameters
+Parameter	Type	Required	Description
+evaluation_id	string	Yes	The unique identifier of the evaluation
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+evaluation_id = 456
+url = f" https://api.4minds.ai/api/v1/evaluations/{evaluation_id}"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+response = requests.get(url, headers=headers)
+evaluation = response.json()
+
+print(f"Evaluation: {evaluation['name']}")
+print(f"Status: {evaluation['status']}")
+print(f"Score: {evaluation['score']}")
+if evaluation.get('results'):
+    print(f"Scores: {evaluation['results']['scores']}")
+​
+Start Running an Evaluation
+POST /api/v1/evaluations/{evaluation_id}/start
+Start running an evaluation.
+​
+Path Parameters
+Parameter	Type	Required	Description
+evaluation_id	string	Yes	The unique identifier of the evaluation
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+evaluation_id = 456
+url = f" https://api.4minds.ai/api/v1/evaluations/{evaluation_id}/start"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+response = requests.post(url, headers=headers)
+result = response.json()
+
+print(result['message'])
+​
+Run RAGAS Evaluation
+POST /api/v1/evaluations/{evaluation_id}/run-ragas
+Run RAGAS evaluation with benchmark data.
+​
+Path Parameters
+Parameter	Type	Required	Description
+evaluation_id	string	Yes	The unique identifier of the evaluation
+Executes a RAGAS (Retrieval Augmented Generation Assessment) benchmark evaluation on the specified evaluation.
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+evaluation_id = 456
+url = f" https://api.4minds.ai/api/v1/evaluations/{evaluation_id}/run-ragas"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "samples": [],
+    "selected_questions": []
+}
+
+response = requests.post(url, headers=headers, json=data)
+evaluation = response.json()
+
+print(f"Evaluation completed: {evaluation['name']}")
+print(f"Score: {evaluation['score']}")
+print(f"Metrics: {evaluation['results']['scores']}")
+​
+Update Evaluation Metadata
+PUT /api/v1/evaluations/{evaluation_id}
+Update an evaluation’s metadata.
+​
+Path Parameters
+Parameter	Type	Required	Description
+evaluation_id	string	Yes	The unique identifier of the evaluation
+​
+Request Body
+Parameter	Type	Required	Description
+name	string	No	Updated name for the evaluation
+description	string	No	Updated description
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+evaluation_id = 456
+url = f" https://api.4minds.ai/api/v1/evaluations/{evaluation_id}"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "name": "Updated Evaluation Name",
+    "description": "Updated description"
+}
+
+response = requests.put(url, headers=headers, json=data)
+evaluation = response.json()
+
+print(f"Updated evaluation: {evaluation['name']}")
+​
+Delete an Evaluation
+DELETE /api/v1/evaluations/{evaluation_id}
+Delete an evaluation (cannot delete running evaluations).
+​
+Path Parameters
+Parameter	Type	Required	Description
+evaluation_id	string	Yes	The unique identifier of the evaluation
+Note: You cannot delete evaluations that are currently running.
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+evaluation_id = 456
+url = f" https://api.4minds.ai/api/v1/evaluations/{evaluation_id}"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+response = requests.delete(url, headers=headers)
+
+if response.status_code == 200:
+    result = response.json()
+    print(result['message'])
+else:
+    print(f"Error: {response.status_code}")
+​
+Check Evaluation Name Availability
+GET /api/v1/evaluations/check-name
+Check if an evaluation name is available.
+​
+Query Parameters
+Parameter	Type	Required	Description
+name	string	Yes	The evaluation name to check
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+url = " https://api.4minds.ai/api/v1/evaluations/check-name"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+params = {
+    "name": "My Evaluation"
+}
+
+response = requests.get(url, headers=headers, params=params)
+result = response.json()
+
+print(f"Available: {result['available']}")
+print(f"Message: {result['message']}")
+​
+Inference
+Perform direct inference queries without streaming, perfect for simple question-answering and batch processing workflows using knowledge graphs.
+​
+Run a Single Query
+POST /api/v1/user/inference
+Run a single query with your knowledge graph.
+​
+Required Parameters
+Parameter	Type	Required	Description
+query	string	Yes	The question or query to process
+model_id	integer	Yes	The ID of the model to use for inference
+​
+Optional Parameters
+Parameter	Type	Required	Description
+conversation_id	string	No	Continue an existing conversation by providing its ID
+thread_id	string	No	Thread identifier for managing conversation history
+enable_web_search	boolean	No	Enable web search to enhance responses (default: false)
+max_tokens	integer	No	Maximum response length (default: model-specific)
+temperature	float	No	Response randomness from 0.0 to 1.0 (default: model-specific)
+image_generation	boolean	No	Enable image generation in responses (default: false)
+image_parameters	object	No	Image generation config: width, height, steps, guidance
+persona	object	No	User persona configuration for customized responses
+base_model	boolean	No	Bypass RAG and use base model directly, useful for evaluations (default: false)
+session_id	string	No	Session tracking identifier
+user_id	string	No	User identifier for tracking and personalization
+tenant_id	string	No	Multi-tenancy identifier for organization-level isolation
+​
+Advanced sampling overrides
+These parameters provide fine-grained control over response generation and are typically used for specialized use cases.
+Parameter	Type	Required	Description
+top_k	integer	No	Top-K sampling: limits token selection to top K options
+top_p	float	No	Nucleus sampling: cumulative probability threshold
+response_length_preference	string	No	Response verbosity: “concise”, “balanced”, or “detailed”
+creativity_level	float	No	Balance between creative and deterministic outputs
+factual_precision	float	No	Preference for factual accuracy in responses
+
+cURL
+
+Python
+
+JavaScript
+
+Node.js
+import requests
+
+url = " https://api.4minds.ai/api/v1/user/inference"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "query": "What is machine learning?",
+    "model_id": 1
+}
+
+response = requests.post(url, headers=headers, json=data)
+result = response.json()
+
+print(result)
+​
+Authentication
+All API requests require authentication using a Bearer token in the Authorization header:
+Authorization: Bearer YOUR_API_KEY
+You can obtain your API key from your 4MINDS dashboard.
+​
+Response Format
+All responses are returned in JSON format.
+​
+Success Response
+{
+  "status": "success",
+  "data": { ... }
+}
+​
+Error Response
+{
+  "status": "error",
+  "message": "Error description"
+}
+4MINDS API Overview

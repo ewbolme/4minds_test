@@ -24,13 +24,16 @@ API_KEY = os.getenv("FOURMIND_API_KEY")
 DATASET_ID = os.getenv("FOURMIND_DATASET_ID")
 UPLOAD_URL = "https://api.4minds.ai/api/v1/user/dataset/upload"
 MAX_BATCH_BYTES = 95 * 1024 * 1024  # 95 MB
+MAX_BATCH_FILES = 500               # keep well under OS fd limit
 
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
 
-LOG_FILE = Path(__file__).parent / "upload.log"
-OVERSIZED_LOG = Path(__file__).parent / "oversized_files.log"
+LOGS_DIR = Path(__file__).parent / "logs"
+LOGS_DIR.mkdir(exist_ok=True)
+LOG_FILE = LOGS_DIR / "upload.log"
+OVERSIZED_LOG = LOGS_DIR / "oversized_files.log"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -82,7 +85,7 @@ def batch_files(files: list[Path]) -> list[list[Path]]:
             log.warning("Skipping %s (%.1f MB) — exceeds 95 MB limit. See oversized_files.log.", f.name, mb)
             oversized_log.info("%.1f MB  %s", mb, f.resolve())
             continue
-        if current_size + size > MAX_BATCH_BYTES and current_batch:
+        if (current_size + size > MAX_BATCH_BYTES or len(current_batch) >= MAX_BATCH_FILES) and current_batch:
             batches.append(current_batch)
             current_batch = []
             current_size = 0
@@ -143,16 +146,27 @@ def main() -> None:
     if not API_KEY:
         log.error("FOURMIND_API_KEY is not set. Add it to your .env file.")
         sys.exit(1)
+
+    # Accept a folder or individual files as CLI arguments.
+    # Optional: --dataset-id <id> overrides FOURMIND_DATASET_ID from .env
+    import argparse
+    parser = argparse.ArgumentParser(description="Upload files to a 4minds dataset.")
+    parser.add_argument("paths", nargs="*", metavar="file_or_folder")
+    parser.add_argument("--dataset-id", default=None, help="Override FOURMIND_DATASET_ID from .env")
+    args = parser.parse_args()
+
+    global DATASET_ID
+    if args.dataset_id:
+        DATASET_ID = args.dataset_id
+
     if not DATASET_ID:
-        log.error("FOURMIND_DATASET_ID is not set. Add it to your .env file.")
+        log.error("FOURMIND_DATASET_ID is not set. Add it to your .env file or pass --dataset-id.")
         sys.exit(1)
 
-    # Accept a folder or individual files as CLI arguments;
-    # default to files in the current directory if none provided.
-    targets = [Path(a) for a in sys.argv[1:]] if len(sys.argv) > 1 else []
+    targets = [Path(p) for p in args.paths]
 
     if not targets:
-        log.error("Usage: python upload.py <file_or_folder> [file_or_folder ...]")
+        log.error("Usage: python upload.py <file_or_folder> [file_or_folder ...] [--dataset-id ID]")
         sys.exit(1)
 
     # Expand folders to their direct children files
