@@ -45,7 +45,7 @@ OPENAI_JUDGE_MODEL = os.getenv("OPENAI_JUDGE_MODEL", "gpt-4.1")
 REQUEST_DELAY = float(os.getenv("REQUEST_DELAY_SECONDS", "1.0"))
 
 HERE = Path(__file__).parent
-DEFAULT_CSV = HERE / "eval_questions" / "Eval_data.csv"
+DEFAULT_CSV = HERE / "pdf_eval_questions" / "Eval_data.csv"
 RESULTS_DIR = HERE / "results"
 RESULTS_DIR.mkdir(exist_ok=True)
 
